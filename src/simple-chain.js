@@ -4,65 +4,42 @@ const { NotImplementedError } = require('../extensions/index.js');
  * Implement chainMaker object according to task description
  * 
  */
-const chainMaker = {
-  chainLength: 0,
-  chain: '',  
-  chainPoints: {
 
-  },
+const chainMaker = {  
+  chainPositions: [],
   
   getLength ()  {
-    return this.chainLength;  
+    return this.chainPositions.length;  
   },
 
   addLink (value) {    
-      if (this.chainLength > 0) {
-        this.chain = `${this.chain}~~( ${value} )`;
-        this.chainLength++;
-      } else {
-        this.chain = `( ${value} )`;
-        this.chainLength++;
-      }
+      this.chainPositions.push(`${value}`);     
       return this;
   },
 
   removeLink (position) {
-    let start = 0,
-        startPosition,
-        end = 0,
-        endPosition;
-    for(let i = 0; i < this.chain.length; ++i) {
-      if (this.chain[i] === '(') {
-        start++;
-        startPosition = i;
-      }
-      if (this.chain[i] === ')') {
-        end++;
-        endPosition = i;
-      }
-      if (end === position){
-        break;
-      }
+    if (typeof position === 'number' && position > 0 && position <= this.chainPositions.length) {
+      this.chainPositions.splice(position-1, 1);     
+      return this;   
+    } else {
+      this.chainPositions = [];
+      throw new Error(`You can't remove incorrect link!`);
     }
-    let chainStart = this.chain.slice(0, startPosition);
-    let chainEnd = this.chain.slice(endPosition+1);
-    this.chain = `${chainStart}${chainEnd}`; 
-    this.chainLength--;
-    return this;   
+    
   },
 
   reverseChain () {
-    this.chain.split('').reverse().join('');
-    return this
+    this.chainPositions.reverse();    
+    return this;
   },
   
   finishChain () {
-    return this.chain;
+    let chain = this.chainPositions.join(' )~~( ');
+    chain = `( ${chain} )`;
+    this.chainPositions = [];
+    return chain;
   }
 };
-
-
-console.log(chainMaker);
 
 module.exports = {
   chainMaker
