@@ -20,14 +20,77 @@ const { NotImplementedError } = require('../lib');
  *
  */
 class VigenereCipheringMachine {
-  encrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
+  vigenereStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  constructor(direct = true) {
+    this.direct = direct;
   }
 
-  decrypt() {
-    // Remove line below and write your code here
-    throw new NotImplementedError('Not implemented');
+  getEncryptChar(letter, cipherChar) {
+    if (!this.vigenereStr.includes(letter)) {
+      return letter;
+    }
+    const row = cipherChar.charCodeAt(0) - 65;
+    const col = letter.charCodeAt(0) - 65;
+    const position = (row + col) % 26;
+    return this.vigenereStr[position];
+  }
+
+  getDecryptChar(letter, cipherChar) {
+    if (!this.vigenereStr.includes(letter)) {
+      return letter;
+    }
+    const row = cipherChar.charCodeAt(0) - 65;
+    const col = letter.charCodeAt(0) - 65;
+    const position = (26 + col - row) % 26;
+    return this.vigenereStr[position];
+  }
+
+  encrypt(text, key) {
+    if (!text || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    let countShiftBack = 0;
+    const keyStr = key
+      .toUpperCase()
+      .repeat(Math.ceil(text.length / key.length))
+      .slice(0, text.length);
+    const result = text
+      .toUpperCase()
+      .split('')
+      .map((letter, index) => {
+        let result = this.getEncryptChar(letter, keyStr[index - countShiftBack])
+        if (result === ' ') {
+          countShiftBack += 1;
+        }
+        return result
+      })
+      .join('');
+
+    return this.direct ? result : result.split('').reverse().join('');
+  }
+
+  decrypt(text, key) {
+    if (!text || !key) {
+      throw new Error('Incorrect arguments!');
+    }
+    let countShiftBack = 0;
+    const keyStr = key
+      .toUpperCase()
+      .repeat(Math.ceil(text.length / key.length))
+      .slice(0, text.length);
+    const result = text
+      .toUpperCase()
+      .split('')
+      .map((letter, index) => {
+        let result = this.getDecryptChar(letter, keyStr[index - countShiftBack])
+        if (result === ' ') {
+          countShiftBack += 1;
+        }
+        return result
+      })
+      .join('');
+
+    return this.direct ? result : result.split('').reverse().join('');
   }
 }
 
